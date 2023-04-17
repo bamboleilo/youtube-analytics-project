@@ -1,15 +1,20 @@
 import json
 import os
+from dotenv import load_dotenv
 
 # необходимо установить через: pip install google-api-python-client
 from googleapiclient.discovery import build
 
 import isodate
 
+#dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+#if os.path.exists(dotenv_path):
+    #load_dotenv(dotenv_path)
 
 class Channel:
     """Класс для ютуб-канала"""
-    api_key: str = os.getenv('YouTube-API')
+
+    api_key: str = os.getenv('YT_API_KEY')
     youtube = build('youtube', 'v3', developerKey=api_key)
 
     def __init__(self, channel_id: str) -> None:
@@ -19,7 +24,7 @@ class Channel:
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
         channel = self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
-        print(channel)
+        print(json.dumps(channel, indent=2, ensure_ascii=False))
 
     @classmethod
     def get_service(cls):
@@ -36,15 +41,11 @@ class Channel:
 
     @property
     def title(self):
-        return \
-        self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['snippet'][
-            'title']
+        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['snippet']['title']
 
     @property
     def description(self):
-        return \
-        self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['snippet'][
-            'description']
+        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['snippet']['description']
 
     @property
     def url(self):
@@ -52,15 +53,39 @@ class Channel:
 
     @property
     def video_count(self):
-        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0][
-            'statistics']['videoCount']
+        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['statistics']['videoCount']
 
     @property
     def subscriber_count(self):
-        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0][
-            'statistics']['subscriberCount']
+        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['statistics']['subscriberCount']
 
     @property
     def view_Count(self):
-        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0][
-            'statistics']['viewCount']
+        return self.youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()['items'][0]['statistics']['viewCount']
+
+    def __str__(self):
+        return f'"{self.title}" ("{self.url}")'
+
+    def __add__(self, other):
+        return int(self.subscriber_count) + int(other.subscriber_count)
+
+    def __sub__(self, other):
+        return int(self.subscriber_count) - int(other.subscriber_count)
+
+    def __eq__(self, other):
+        return int(self.subscriber_count) == int(other.subscriber_count)
+
+    def __ne__(self, other):
+        return int(self.subscriber_count) != int(other.subscriber_count)
+
+    def __lt__(self, other):
+        return int(self.subscriber_count) < int(other.subscriber_count)
+
+    def __le__(self, other):
+        return int(self.subscriber_count) <= int(other.subscriber_count)
+
+    def __gt__(self, other):
+        return int(self.subscriber_count) > int(other.subscriber_count)
+
+    def __ge__(self, other):
+        return int(self.subscriber_count) >= int(other.subscriber_count)
