@@ -2,9 +2,6 @@ import os
 
 from googleapiclient.discovery import build
 
-from googleapiclient.errors import HttpError
-
-
 
 class Video:
     api_key: str = os.getenv('YT_API_KEY')
